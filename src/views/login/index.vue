@@ -5,8 +5,8 @@
             <img src="../../assets/img/logo_index.png" alt="">
         </div>
         <el-form ref="myForm" :model="loginForm" :rules="loginRules">
-            <el-form-item prop="phone">
-                <el-input placeholder="请输入手机号" v-model="loginForm.phone">
+            <el-form-item prop="mobile">
+                <el-input placeholder="请输入手机号" v-model="loginForm.mobile">
                 </el-input>
             </el-form-item>
 
@@ -34,12 +34,12 @@ export default {
   data () {
     return {
       loginForm: {
-        phone: '',
+        mobile: '',
         code: '',
         check: false
       },
       loginRules: {
-        phone: [{ required: true, message: '请输入正确的手机号' },
+        mobile: [{ required: true, message: '请输入正确的手机号' },
           { pattern: /^1[3456789]\d{9}$/, message: '手机号格式不正确' }],
         code: [{ required: true, message: '请输入你的验证码' },
           { pattern: /^\d{6}$/, message: '验证码格式不正确' }
@@ -58,9 +58,20 @@ export default {
   },
   methods: {
     submitLogin () {
-      this.$refs.myForm.validate(function (isOk) {
+      this.$refs.myForm.validate(isOk => {
         if (isOk) {
-          console.log('验证通过')
+        //   console.log('验证通过')(
+          this.$axios({
+            url: '/authorizations',
+            method: 'post',
+            data: this.loginForm
+          }).then(res => {
+            window.localStorage.setItem('user-token', res.data.data.token)
+            this.$router.push('/home')
+          }).catch(() => {
+            this.$message({ type: 'warning',
+              message: '手机号或者验证码错误' })
+          })
         }
       })
     }
