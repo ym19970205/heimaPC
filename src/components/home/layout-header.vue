@@ -6,9 +6,13 @@
         </el-col>
         <el-col :span="12">
             <el-row class="right" type="flex" justify="end" align="middle">
-                <img src="../../assets/img/avatar.jpg" alt="">
+                <!-- <img :src="userInfo.photo" alt=""> -->
+                <!-- 如果接口中没有图片时，我们需要用三元表达式来判断，并且设置默认图片 -->
+                <!-- 如果想要显示后面的图片，需要将图片地址换为变量，在下面定义一个 变量：require(地址) -->
+                 <!-- <img :src="!userInfo.photo?userInfo.photo:defaultImg" alt=""> -->
                 <el-dropdown>
-                <span>crush</span>
+
+                <span>{{userInfo.name}}</span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item>个人信息</el-dropdown-item>
                         <el-dropdown-item>git地址</el-dropdown-item>
@@ -24,7 +28,25 @@
 
 <script>
 export default {
-
+  // 定义一个用户对象
+  data () {
+    return {
+      userInfo: {},
+      defaultImg: require('../../assets/img/avatar.jpg')
+    }
+  },
+  created () {
+    let token = localStorage.getItem('user-token')
+    this.$axios({
+      url: '/user/profile',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).then(res => {
+      this.userInfo = res.data.data
+    //   console.log(res.data.data)
+    })
+  }
 }
 </script>
 
