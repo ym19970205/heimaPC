@@ -4,7 +4,7 @@
     <img src="../../assets/img/logo_admin.png" alt="">
   </div>
   <!-- 左侧导航组件 -->
-   <el-menu background-color="#323745" text-color="#adafb5">
+   <el-menu router background-color="#323745" text-color="#adafb5">
      <!-- 没有折叠选项 -->
        <el-menu-item index="/home">首页
        </el-menu-item>
@@ -18,7 +18,7 @@
           <el-menu-item index="/home/comment">评论列表</el-menu-item>
           <el-menu-item index="/home/material">素材管理</el-menu-item>
         </el-submenu>
-        <el-submenu>
+        <el-submenu index="2">
           <template slot="title">粉丝管理</template>
           <el-menu-item index="/home/picture">图文数据</el-menu-item>
           <el-menu-item index="/home/fansinfo">粉丝概况</el-menu-item>
