@@ -1,5 +1,5 @@
 <template>
-<el-card>
+<el-card v-loading="loading">
     <bread-crumb slot="header">
         <template slot="title">
             评论管理
@@ -36,6 +36,7 @@ export default {
   data () {
     return {
       list: [], // 定义一个数据接收返回结果
+      loading: false,
       page: { // 创建一个对象，专门存放分页信息数据
         total: 0, // 评论总条数
         pageSize: 10, // 每页显示多少条
@@ -51,6 +52,7 @@ export default {
       this.getComment()
     },
     getComment () {
+      this.loading = true
       this.$axios({
         url: '/articles',
         params: {
@@ -62,6 +64,7 @@ export default {
         // 把获取到的文章列表数据赋值给list数组
         this.list = res.data.results
         this.page.total = res.data.total_count
+        this.loading = false
       })
     },
 
