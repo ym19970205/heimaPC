@@ -18,6 +18,16 @@
           </template>
       </el-table-column>
     </el-table>
+    <el-row type="flex" justify="center" align="middle" style="height:80px">
+    <el-pagination
+      background
+      layout="prev, pager, next"
+      :current-page="page.currentPage"
+      @current-change="changePage"
+      :page-size="page.pageSize"
+      :total="page.total">
+    </el-pagination>
+    </el-row>
 </el-card>
 </template>
 
@@ -25,21 +35,36 @@
 export default {
   data () {
     return {
-      list: [] // 定义一个数据接收返回结果
+      list: [], // 定义一个数据接收返回结果
+      page: { // 创建一个对象，专门存放分页信息数据
+        total: 0, // 评论总条数
+        pageSize: 10, // 每页显示多少条
+        currentPage: 1 // 当前页码
+      }
     }
   },
   methods: {
+    // 页码改变事件
+    changePage (newPage) {
+      this.page.currentPage = newPage // 获取到了最新的页码，拿到最新的页码，我们就需要刷新页面
+      // alert(newPage)
+      this.getComment()
+    },
     getComment () {
       this.$axios({
         url: '/articles',
         params: {
-          response_type: 'comment'
+          response_type: 'comment',
+          page: this.page.currentPage,
+          per_page: this.page.pageSize
         }
       }).then(res => {
         // 把获取到的文章列表数据赋值给list数组
         this.list = res.data.results
+        this.page.total = res.data.total_count
       })
     },
+
     // 定义一个格式化的函数
     formatterBoolean (row, column, cellValue, index) {
       // row 当前行数据
