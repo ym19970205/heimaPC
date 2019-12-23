@@ -1,10 +1,19 @@
 <template>
-<el-card>
+<el-card v-loading="loading">
+     <!--头部内容，面包屑 -->
     <bread-crumb slot="header">
     <template slot="title">
         素材管理
     </template>
     </bread-crumb>
+    <!--上传 -->
+    <el-row type="flex" justify="end">
+      <el-upload action="" :http-request="uploadImg" :show-file-list="false">
+        <el-button size="small" type="primary">上传图片</el-button>
+      </el-upload>
+    </el-row>
+
+    <!--标签页 -->
      <el-tabs v-model="activeName" @tab-click="changeTab">
     <el-tab-pane label="全部" name="all">
       <div class="img-list">
@@ -45,6 +54,7 @@
 export default {
   data () {
     return {
+      loading: false,
       activeName: 'all',
       list: [], // 定义一个接受的数组
       page: {
@@ -56,6 +66,19 @@ export default {
     }
   },
   methods: {
+    uploadImg (params) {
+      this.loading = true // 先弹个层
+      let data = new FormData()
+      data.append('image', params.file) // 参数名：参数
+      this.$axios({
+        method: 'post',
+        url: '/user/images',
+        data
+      }).then(res => {
+        this.loading = false // 关闭弹层
+        this.getMaterial()
+      })
+    },
     // 改变页码的方法
     changePage (newPage) {
       this.page.currentPage = newPage
