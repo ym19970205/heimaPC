@@ -19,8 +19,7 @@ axios.interceptors.request.use(function (config) {
   return config
 })
 axios.defaults.transformResponse = [function (data) {
-  let result = JSONBig.parse(data)
-  return result
+  return data ? JSONBig.parse(data) : {}
 }]
 
 // 响应服务器，数据响应回来，到达then之前
