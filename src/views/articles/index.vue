@@ -16,7 +16,7 @@
                 <el-radio :label="2">审核通过</el-radio>
                 <el-radio :label="3">审核失败</el-radio>
         </el-radio-group>
-        {{searchForm}}
+        <!-- {{searchForm}} -->
         </el-form-item>
         <el-form-item label="频道列表：">
             <el-select v-model="searchForm.channel_id" placeholder="请选择频道">
@@ -27,20 +27,20 @@
         <el-form-item label="时间选择：">
         <el-date-picker type="daterange" v-model="searchForm.dateRange">
         </el-date-picker>
-            {{value}}
+            <!-- {{value}} -->
         </el-form-item>
     </el-form>
     <el-row class="total" type="flex" align="middle">
-        <span>共找到10000000条符合条件的内容</span>
+        <span>共找到999999条符合条件的内容</span>
     </el-row>
     <!--左侧div-->
-    <div class="article-item" v-for="item in 5" :key="item">
+    <div class="article-item" v-for="item in list" :key="item.id.toString()">
         <div class="left">
-            <img src="../../assets/img/default.jpg" alt="">
+            <img :src="item.cover.images.length?item.cover.images[0]:defaultImg" alt="">
             <div class="info">
-                <span>给span加上max-width:35em，刚才是谁删的</span>
-                <el-tag class='tag'>标签</el-tag>
-                <span class='date'>2019-12-24 15:07:01</span>
+                <span>{{item.title}}</span>
+                <el-tag :type="item.status | filterType" class='tag'>{{item.status | filterStatus}}</el-tag>
+                <span class='date'>{{item.pubdate}}</span>
             </div>
         </div>
             <div class="right">
@@ -64,9 +64,44 @@ export default {
         dateRange: []
 
       },
-      channels: [] // 接收频道数据
-
+      channels: [], // 接收频道数据
+      list: [], // 文章列表
+      defaultImg: require('../../assets/img/default.jpg')
     }
+  },
+  // 过滤器，用来判断状态对应的值
+  filters: {
+    filterStatus (value) {
+      switch (value) {
+        case 0:
+          return '草稿'
+        case 1:
+          return '待审核'
+        case 2:
+          return '已发表'
+        case 3:
+          return '审核失败'
+
+        default:
+          break
+      }
+    },
+    filterType (value) {
+      switch (value) {
+        case 0:
+          return 'warning'
+        case 1:
+          return 'info'
+        case 2:
+          return ''
+        case 3:
+          return 'danger'
+
+        default:
+          break
+      }
+    }
+
   },
   methods: {
     // 获取所有的频道
@@ -76,10 +111,18 @@ export default {
       }).then((res) => {
         this.channels = res.data.channels
       })
+    },
+    getArticles () {
+      this.$axios({
+        url: '/articles'
+      }).then((res) => {
+        this.list = res.data.results
+      })
     }
   },
   created () {
     this.getChannels()
+    this.getArticles()
   }
 }
 </script>
@@ -120,7 +163,7 @@ export default {
             }
         }
     }
-    .right {
+             .right {
               span {
                   font-size:14px;
                   margin-right: 8px;
