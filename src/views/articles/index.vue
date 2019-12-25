@@ -31,7 +31,7 @@
         </el-form-item>
     </el-form>
     <el-row class="total" type="flex" align="middle">
-        <span>共找到999999条符合条件的内容</span>
+        <span>共找到{{page.total}}条符合条件的内容</span>
     </el-row>
     <!--左侧div-->
     <div class="article-item" v-for="item in list" :key="item.id.toString()">
@@ -45,7 +45,7 @@
         </div>
             <div class="right">
         <span><i class="el-icon-edit"></i>修改</span>
-        <span><i class="el-icon-delete"></i>删除</span>
+        <span @click="delMaterial(item.id)"><i class="el-icon-delete"></i>删除</span>
     </div>
     </div>
 <el-row type="flex" justify="center" align="middle" style="height:60px">
@@ -129,6 +129,23 @@ export default {
 
   },
   methods: {
+    // 删除文章
+    delMaterial (id) {
+      this.$confirm('是否要删除该文章？').then(() => {
+        this.$axios({
+          method: 'delete',
+          url: `articles/${id.toString()}`
+        }).then((res) => {
+          // 提示
+          this.$message({
+            type: 'success',
+            message: '删除成功'
+          })
+          // 重新拉取数据
+          this.getArticles()
+        })
+      })
+    },
     // 改变页码事件：
     changPage (newPage) {
       this.page.currentPage = newPage // 把当前页码赋值给点击的新页码
