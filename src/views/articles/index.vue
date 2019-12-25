@@ -25,9 +25,9 @@
              </el-select>
         </el-form-item>
         <el-form-item label="时间选择：">
-        <el-date-picker type="daterange" v-model="searchForm.dateRange">
+        <el-date-picker value-format="yyyy-MM-dd" type="daterange" v-model="searchForm.dateRange">
         </el-date-picker>
-            <!-- {{value}} -->
+            <!-- {{searchForm.dateRange}} -->
         </el-form-item>
     </el-form>
     <el-row class="total" type="flex" align="middle">
@@ -69,6 +69,16 @@ export default {
       defaultImg: require('../../assets/img/default.jpg')
     }
   },
+  // 通过watch监听三种状态
+  watch: {
+    searchForm: {
+      deep: true,
+      handler () {
+        this.changeCondition()
+      }
+    }
+  },
+
   // 过滤器，用来判断状态对应的值
   filters: {
     filterStatus (value) {
@@ -104,6 +114,16 @@ export default {
 
   },
   methods: {
+    // 改变条件
+    changeCondition () {
+      let params = {
+        status: this.searchForm.status === 5 ? null : this.searchForm.status,
+        channel_id: this.searchForm.channel_id,
+        begin_pubdate: this.searchForm.dateRange.length ? this.searchForm.dateRange[0] : null,
+        end_pubdate: this.searchForm.dateRange.length > 1 ? this.searchForm.dateRange[1] : null
+      }
+      this.getArticles(params)
+    },
     // 获取所有的频道
     getChannels () {
       this.$axios({
@@ -112,9 +132,12 @@ export default {
         this.channels = res.data.channels
       })
     },
-    getArticles () {
+
+    // 获取文章列表数据
+    getArticles (params) {
       this.$axios({
-        url: '/articles'
+        url: '/articles',
+        params
       }).then((res) => {
         this.list = res.data.results
       })
