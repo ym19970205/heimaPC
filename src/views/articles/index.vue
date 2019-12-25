@@ -48,9 +48,17 @@
         <span><i class="el-icon-delete"></i>删除</span>
     </div>
     </div>
-
-    <!--右侧div-->
-    <div></div>
+<el-row type="flex" justify="center" align="middle" style="height:60px">
+  <el-pagination
+  background
+  layout="prev, pager, next"
+  :total="page.total"
+  :current-page="page.currentPage"
+  :page-size="page.pageSize"
+  @current-change="changPage"
+  >
+</el-pagination>
+</el-row>
   </el-card>
 </template>
 
@@ -58,6 +66,13 @@
 export default {
   data () {
     return {
+      // 分页对象
+      page: {
+        total: 0,
+        currentPage: 1,
+        pageSize: 10
+
+      },
       searchForm: {
         status: 5, // 默认应该选中全部
         channel_id: null,
@@ -114,9 +129,20 @@ export default {
 
   },
   methods: {
-    // 改变条件
+    // 改变页码事件：
+    changPage (newPage) {
+      this.page.currentPage = newPage // 把当前页码赋值给点击的新页码
+      this.getConditionArticles()
+    },
+    // 三个状态 改变条件
     changeCondition () {
+      this.page.currentPage = 1 // 切换时强制将页码切换为1
+      this.getConditionArticles()
+    },
+    getConditionArticles () {
       let params = {
+        page: this.page.currentPage,
+        per_page: this.page.pageSize,
         status: this.searchForm.status === 5 ? null : this.searchForm.status,
         channel_id: this.searchForm.channel_id,
         begin_pubdate: this.searchForm.dateRange.length ? this.searchForm.dateRange[0] : null,
@@ -140,12 +166,13 @@ export default {
         params
       }).then((res) => {
         this.list = res.data.results
+        this.page.total = res.data.total_count
       })
     }
   },
   created () {
     this.getChannels()
-    this.getArticles()
+    this.getArticles({ page: 1, per_page: 10 })
   }
 }
 </script>
