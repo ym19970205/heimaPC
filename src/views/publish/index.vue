@@ -68,6 +68,25 @@ export default {
       }
     }
   },
+  watch: {
+    // 处理 两个地址对应同一个组件跳转的时候 组件不销毁 但是数据没有重置的问题
+    $route: function (to, from) {
+      if (to.params.articleId) {
+        // 如果有参数，就是修改
+      } else {
+        // 如果有参数，就是发布。发布的时候需要把所有的内容清空
+        this.formData = {
+          title: '', // 标题
+          content: '', // 内容
+          cover: { // 封面
+            type: 0, // 封面类型
+            images: []// 封面图片
+          },
+          channel_id: null
+        }
+      }
+    }
+  },
   methods: {
     getChannels () {
       this.$axios({
@@ -76,6 +95,7 @@ export default {
         this.channels = res.data.channels
       })
     },
+    // 发布文章 发布到草稿/正式文章
     publishArticle (draft) {
       this.$refs.formPublish.validate((isOk) => {
         if (isOk) {
@@ -96,10 +116,21 @@ export default {
           })
         }
       })
+    },
+    // 通过id查询文章数据
+    getArticleById (articleId) {
+      this.$axios({
+        url: `articles/${articleId}`
+      }).then((res) => {
+        this.formData = res.data
+      })
     }
   },
   created () {
     this.getChannels()
+    // 一进入页面就要获取文章id
+    let{ articleId } = this.$route.params
+    articleId && this.getArticleById(articleId) // 如果id存在 直接查询文章数据
   }
 }
 </script>
