@@ -19,7 +19,11 @@
           </el-pagination>
       </el-row>
     </el-tab-pane>
-    <el-tab-pane label="上传图片" name="upload">上传图片</el-tab-pane>
+    <el-tab-pane label="上传图片" name="upload">
+        <el-upload class="upload-image" action="" :show-file-list="false" :http-request="uploadImg">
+            <i class="el-icon-plus"></i>
+        </el-upload>
+    </el-tab-pane>
   </el-tabs>
 </template>
 
@@ -37,6 +41,18 @@ export default {
     }
   },
   methods: {
+    // 上传组件方法
+    uploadImg (params) {
+      let data = new FormData()
+      data.append('image', params.file) // 参数名：参数
+      this.$axios({
+        method: 'post',
+        url: '/user/images',
+        data
+      }).then(res => {
+        this.$emit('selectOneImg', res.data.url)
+      })
+    },
     // 图片点击事件
     clickImg (url) {
       // 给父组件传值
@@ -82,5 +98,15 @@ export default {
     width: 100%;
     height: 100%;
   }
+}
+.upload-image{
+    display: flex;
+    justify-content: center;
+    i{
+        font-size: 50px;
+        padding: 50px;
+        border: 1px dashed #ccc;
+        border-radius: 4px;
+    }
 }
 </style>
