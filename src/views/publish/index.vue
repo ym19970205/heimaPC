@@ -28,7 +28,7 @@
           步骤：1.给谁传就在谁的标签上写属性    ：自定义属性名=‘父组件属性名’
                 2.在子组件写props:['自定义的属性名']
                 3.在子组件中使用-->
-          <cover-img :list='formData.cover.images'></cover-img>
+          <cover-img @selectTwoImg="receiveImg" :list='formData.cover.images'></cover-img>
           <el-form-item label="频道" prop="channel_id">
               <el-select v-model="formData.channel_id" placeholder="请选择">
                 <el-option
@@ -101,6 +101,18 @@ export default {
     // }
   },
   methods: {
+    receiveImg (url, index) {
+      // 现在拿到的是url地址，但是要改的是数组,所以获取了下标
+      // this.formData.cover.images[index] = url  //这种方法是错误的，不能保证每次都成功
+      // this.formData.cover.images = this.formData.cover.images.map(function (item, i) {
+      //   if (index === i) {
+      //     return url
+      //   }
+      //   return item
+      // })
+      // 一行代码简写上面
+      this.formData.cover.images = this.formData.cover.images.map((item, i) => i === index ? url : item)
+    },
     changeType () {
       if (this.formData.cover.type === 0 || this.formData.cover.type === -1) {
         this.formData.cover.images = [] // 无图或者自动
