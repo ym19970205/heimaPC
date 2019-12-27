@@ -17,14 +17,18 @@
               </quill-editor>
           </el-form-item>
           <el-form-item style="margin-top:120px" label="封面" prop="cover">
-            <el-radio-group v-model="formData.cover.type">
+            <el-radio-group @change="changeType" v-model="formData.cover.type">
             <el-radio :label="1">单图</el-radio>
             <el-radio :label="3">三图</el-radio>
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
-          {{formData.cover}}
           </el-form-item>
+          <!--父传子，把image的传给子
+          步骤：1.给谁传就在谁的标签上写属性    ：自定义属性名=‘父组件属性名’
+                2.在子组件写props:['自定义的属性名']
+                3.在子组件中使用-->
+          <cover-img :list='formData.cover.images'></cover-img>
           <el-form-item label="频道" prop="channel_id">
               <el-select v-model="formData.channel_id" placeholder="请选择">
                 <el-option
@@ -74,7 +78,7 @@ export default {
       if (to.params.articleId) {
         // 如果有参数，就是修改
       } else {
-        // 如果有参数，就是发布。发布的时候需要把所有的内容清空
+        // 如果没有参数，就是发布。发布的时候需要把所有的内容清空
         this.formData = {
           title: '', // 标题
           content: '', // 内容
@@ -85,8 +89,19 @@ export default {
           channel_id: null
         }
       }
-    },
-    'formData.cover.type': function () {
+    }
+    // 'formData.cover.type': function () {
+    //   if (this.formData.cover.type === 0 || this.formData.cover.type === -1) {
+    //     this.formData.cover.images = [] // 无图或者自动
+    //   } else if (this.formData.cover.type === 1) {
+    //     this.formData.cover.images = ['']
+    //   } else if (this.formData.cover.type === 3) {
+    //     this.formData.cover.images = ['', '', '']
+    //   }
+    // }
+  },
+  methods: {
+    changeType () {
       if (this.formData.cover.type === 0 || this.formData.cover.type === -1) {
         this.formData.cover.images = [] // 无图或者自动
       } else if (this.formData.cover.type === 1) {
@@ -94,9 +109,7 @@ export default {
       } else if (this.formData.cover.type === 3) {
         this.formData.cover.images = ['', '', '']
       }
-    }
-  },
-  methods: {
+    },
     getChannels () {
       this.$axios({
         url: '/channels'
