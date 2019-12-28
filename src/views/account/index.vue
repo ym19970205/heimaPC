@@ -1,5 +1,5 @@
 <template>
-  <el-card>
+  <el-card v-loading="loading">
       <bread-crumb slot="header">
       <template slot="title">
           账号信息
@@ -25,7 +25,7 @@
      </el-form>
 
      <!--上传组件-->
-      <el-upload prop="photo" class="upload-img" action="" :show-file-list="false">
+      <el-upload :http-request="uploadImg" prop="photo" class="upload-img" action="" :show-file-list="false">
         <img :src="formData.photo?formData.photo:defalutImg" alt="">
       </el-upload>
   </el-card>
@@ -35,6 +35,7 @@
 export default {
   data () {
     return {
+      loading: false, // 定义弹层变量
       formData: {
         name: '', // 用户名
         intro: '', // 简介
@@ -56,6 +57,20 @@ export default {
     }
   },
   methods: {
+    // 上传图片信息
+    uploadImg (params) {
+      this.loading = true
+      let data = new FormData()
+      data.append('photo', params.file)
+      this.$axios({
+        url: '/user/photo',
+        method: 'patch',
+        data
+      }).then(res => {
+        this.loading = false
+        this.formData.photo = res.data.photo
+      })
+    },
     // 保存信息
     saveInfo () {
       this.$refs.myForm.validate().then(res => {
