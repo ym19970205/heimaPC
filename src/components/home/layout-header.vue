@@ -49,7 +49,7 @@ export default {
   methods: {
     clickbuttons (command) {
       if (command === 'Info') {
-
+        this.$router.push('/home/account')
       } else if (command === 'git') {
         //   如果点击git，我们要跳到git网
         window.location.href = 'https://github.com/ym19970205/heimaPC'
