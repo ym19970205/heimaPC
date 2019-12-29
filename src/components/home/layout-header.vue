@@ -1,7 +1,7 @@
 <template>
     <el-row class="layout-header" type="flex" align="middle">
         <el-col class="left" :span="12">
-            <i class="el-icon-s-fold"></i>
+            <i @click="collapseOrOpen" :class="{'el-icon-s-unfold':collapse,'el-icon-s-fold':!collapse }"></i>
             <span>江苏传智播客教育科技股份有限公司</span>
         </el-col>
         <el-col :span="12">
@@ -31,6 +31,7 @@ export default {
   // 定义一个用户对象
   data () {
     return {
+      collapse: false, // 默认展开状态
       userInfo: {},
       defaultImg: require('../../assets/img/avatar.jpg')
     }
@@ -45,6 +46,12 @@ export default {
     })
   },
   methods: {
+    // 折叠或者展开
+    collapseOrOpen () {
+      this.collapse = !this.collapse
+      // 用点击事件的状态来通知组件
+      eventBus.$emit('changeCollapse') // 触发一个事件
+    },
     getUserInfo () {
       this.$axios({
         url: '/user/profile'

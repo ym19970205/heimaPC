@@ -2,8 +2,8 @@
   <!-- 放置一个大容器 -->
   <el-container>
     <!-- 左右布局 -->
-    <el-aside style="min-height:100vh;background-color:#353b4e;width:230px;">
-      <layout-aside></layout-aside>
+    <el-aside :style="{width:collapse?'60px':'230px'}" style="transition: all 0.5s; min-height:100vh;background-color:#353b4e;">
+      <layout-aside :collapse="collapse"></layout-aside>
     </el-aside>
     <!-- 右侧容器 -->
     <el-container>
@@ -21,9 +21,19 @@
 </template>
 
 <script>
-
+import eventBus from '../../utils/eventBus'
 export default {
-
+  data () {
+    return {
+      collapse: false
+    }
+  },
+  created () {
+    eventBus.$on('changeCollapse', () => {
+      // 头部组件告诉折叠相关的所有组件要改变了
+      this.collapse = !this.collapse
+    })
+  }
 }
 </script>
 
