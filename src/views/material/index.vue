@@ -17,8 +17,8 @@
      <el-tabs v-model="activeName" @tab-click="changeTab">
     <el-tab-pane label="全部" name="all">
       <div class="img-list">
-        <el-card class="img-card" v-for="item in list" :key="item.id">
-          <img :src="item.url" alt="">
+        <el-card class="img-card" v-for="(item,index) in list" :key="item.id">
+          <img @click="openDialog(index)" :src="item.url" alt="">
           <el-row class="operate" type="flex" align="middle" justify="space-around">
             <!--需要根据当前是否收藏的状态来决定 是否给图标颜色-->
            <i @click="collectOrCancel(item)" :style="{color:item.is_collected?'red':'#000' }" class="el-icon-star-on"></i>
@@ -31,7 +31,7 @@
     <el-tab-pane label="收藏" name="sc">
       <div class="img-list">
         <el-card class="img-card" v-for="item in list" :key="item.id">
-          <img :src="item.url" alt="">
+          <img @click="openDialog(index)" :src="item.url" alt="">
         </el-card>
       </div>
     </el-tab-pane>
@@ -48,13 +48,22 @@
           >
         </el-pagination>
       </el-row>
+      <el-dialog @opened="openEnd" :visible="dialogVisible" @close="dialogVisible=false">
+         <el-carousel ref="mycarousel" indicator-position="outside">
+    <el-carousel-item v-for="(item,index) in list" :key="index">
+      <img style="width:100%;height:100%" :src="item.url" alt="">
+    </el-carousel-item>
+  </el-carousel>
+      </el-dialog>
 </el-card>
+
 </template>
 
 <script>
 export default {
   data () {
     return {
+      dialogVisible: false, // 弹层显示隐藏
       loading: false,
       activeName: 'all',
       list: [], // 定义一个接受的数组
@@ -63,10 +72,20 @@ export default {
         pageSize: 8,
         total: 0
 
-      }
+      },
+      clickIndex: -1 // 点击的index
     }
   },
   methods: {
+    openEnd () {
+      // 此时 已经可以获取走马灯实例了 ref
+      this.$refs.mycarousel.setActiveItem(this.clickIndex)
+    },
+    // 打开弹层
+    openDialog (index) {
+      this.dialogVisible = true
+      this.clickIndex = index // 存储点击索引
+    },
     // 删除用户图片素材
     delImg (id) {
       this.$confirm('你确定要删除此图片吗？').then(() => {
