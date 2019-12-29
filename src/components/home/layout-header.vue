@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import eventBus from '../../utils/eventBus'
 export default {
   // 定义一个用户对象
   data () {
@@ -35,18 +36,24 @@ export default {
     }
   },
   created () {
+    this.getUserInfo()
     // let token = localStorage.getItem('user-token')
-    this.$axios({
-      url: '/user/profile'
-      // headers: {
-      //   Authorization: `Bearer ${token}`
-      // }
-    }).then(res => {
-      this.userInfo = res.data
-    //   console.log(res.data.data)
+
+    // 开启监听
+    eventBus.$on('updateUserInfo', () => {
+      this.getUserInfo()
     })
   },
   methods: {
+    getUserInfo () {
+      this.$axios({
+        url: '/user/profile'
+
+      }).then(res => {
+        this.userInfo = res.data
+        //   console.log(res.data.data)
+      })
+    },
     clickbuttons (command) {
       if (command === 'Info') {
         this.$router.push('/home/account')
