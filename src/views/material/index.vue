@@ -87,41 +87,36 @@ export default {
       this.clickIndex = index // 存储点击索引
     },
     // 删除用户图片素材
-    delImg (id) {
-      this.$confirm('你确定要删除此图片吗？').then(() => {
-        this.$axios({
-          method: 'delete',
-          url: `/user/images/${id}`
-        }).then(() => {
-          this.getMaterial()
-        })
+    async delImg (id) {
+      await this.$confirm('你确定要删除此图片吗？')
+      await this.$axios({
+        method: 'delete',
+        url: `/user/images/${id}`
       })
+      this.getMaterial()
     },
     // 取消或者收藏方法
-    collectOrCancel (item) {
-      this.$axios({
+    async collectOrCancel (item) {
+      await this.$axios({
         method: 'put',
         url: `/user/images/${item.id}`,
         data: {
           collect: !item.is_collected // 取反，因为是收藏，所以点击需要取消收藏
         }
-      }).then(res => {
-        // 再去获取一下素材方法
-        this.getMaterial()
       })
+      this.getMaterial()
     },
-    uploadImg (params) {
+    async uploadImg (params) {
       this.loading = true // 先弹个层
       let data = new FormData()
       data.append('image', params.file) // 参数名：参数
-      this.$axios({
+      await this.$axios({
         method: 'post',
         url: '/user/images',
         data
-      }).then(res => {
-        this.loading = false // 关闭弹层
-        this.getMaterial()
       })
+      this.loading = false // 关闭弹层
+      this.getMaterial()
     },
     // 改变页码的方法
     changePage (newPage) {
@@ -134,8 +129,8 @@ export default {
       this.getMaterial() // 当点击这个改变事件的时候，触发收藏与全部布尔值的判断
     },
     // 获取素材的方法
-    getMaterial () {
-      this.$axios({
+    async getMaterial () {
+      let res = await this.$axios({
         url: '/user/images',
         params: {
           // collect: false // 传入false是获取所有的数据，传入true是获取收藏的数据
@@ -143,12 +138,9 @@ export default {
           page: this.page.currentPage,
           per_page: this.page.pageSize
         }
-      }).then((res) => {
-        this.list = res.data.results // 获取图片信息
-        this.page.total = res.data.total_count
-        // this.page.currentPage = res.data.page
-        // this.page.pageSize = res.data.per_page
       })
+      this.list = res.data.results // 获取图片信息
+      this.page.total = res.data.total_count
     }
   },
   created () {

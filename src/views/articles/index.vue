@@ -134,21 +134,18 @@ export default {
       this.$router.push(`/home/publish/${id.toString()}`)
     },
     // 删除文章
-    delMaterial (id) {
-      this.$confirm('是否要删除该文章？').then(() => {
-        this.$axios({
-          method: 'delete',
-          url: `articles/${id.toString()}`
-        }).then((res) => {
-          // 提示
-          this.$message({
-            type: 'success',
-            message: '删除成功'
-          })
-          // 重新拉取数据
-          this.getArticles()
-        })
+    async delMaterial (id) {
+      await this.$confirm('是否要删除该文章？')
+      await this.$axios({
+        method: 'delete',
+        url: `articles/${id.toString()}`
       })
+      this.$message({
+        type: 'success',
+        message: '删除成功'
+      })
+      // 重新拉取数据
+      this.getArticles()
     },
     // 改变页码事件：
     changPage (newPage) {
@@ -172,23 +169,21 @@ export default {
       this.getArticles(params)
     },
     // 获取所有的频道
-    getChannels () {
-      this.$axios({
+    async getChannels () {
+      let res = await this.$axios({
         url: '/channels'
-      }).then((res) => {
-        this.channels = res.data.channels
       })
+      this.channels = res.data.channels
     },
 
     // 获取文章列表数据
-    getArticles (params) {
-      this.$axios({
+    async getArticles (params) {
+      let res = await this.$axios({
         url: '/articles',
         params
-      }).then((res) => {
-        this.list = res.data.results
-        this.page.total = res.data.total_count
       })
+      this.list = res.data.results
+      this.page.total = res.data.total_count
     }
   },
   created () {

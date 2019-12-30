@@ -51,21 +51,19 @@ export default {
       // alert(newPage)
       this.getComment()
     },
-    getComment () {
+    async getComment () {
       this.loading = true
-      this.$axios({
+      let res = await this.$axios({
         url: '/articles',
         params: {
           response_type: 'comment',
           page: this.page.currentPage,
           per_page: this.page.pageSize
         }
-      }).then(res => {
-        // 把获取到的文章列表数据赋值给list数组
-        this.list = res.data.results
-        this.page.total = res.data.total_count
-        this.loading = false
       })
+      this.list = res.data.results
+      this.page.total = res.data.total_count
+      this.loading = false
     },
 
     // 定义一个格式化的函数
@@ -77,22 +75,20 @@ export default {
     //   有多少条数据就执行多少次formatter
       return cellValue ? '正常' : '关闭'
     },
-    openOrCloseState (row) {
+    async openOrCloseState (row) {
       let mess = row.comment_status ? '关闭' : '打开'
-      this.$confirm(`您是否确定要${mess}评论吗`, '提示').then(() => {
-        // 调用接口
-        this.$axios({
+      try {
+        await this.$confirm(`您是否确定要${mess}评论吗`, '提示')
+        await this.$axios({
           method: 'put',
           url: '/comments/status',
           params: { article_id: row.id.toString() },
           data: { allow_comment: !row.comment_status } // 因为当前如果是打开 ,就要关闭 如果是关闭 就要打开
-        }).then(result => {
-          //  表示执行成功
-          this.getComment() // 重新拉取评论管理数据
-        }).catch(() => {
-          debugger
         })
-      })
+        this.getComment() // 重新拉取评论管理数据
+      } catch (error) {
+
+      }
     }
   },
   created () {
